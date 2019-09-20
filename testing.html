@@ -1,0 +1,108 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>prueba</title>
+</head>
+
+<body>
+    <div id="main">
+        <h3>testing</h3>
+        <button id="btn-view">ver plan</button>
+        <div id="append"></div>
+    </div>
+
+    <script>
+
+        window.onload = function () {
+            $("#btn-view").onclick = function () { $('#append').innerHTML = viewPlan(myPlan.workouts) }
+        };
+
+        function $(selector) { // works just like JQuery -> $("#main")
+            return document.querySelector(selector);
+        }
+
+        ///////////
+
+        var groups = {
+            group1: "Cadete - Hombre",
+            group2: "Cadete - Dama",
+            group3: "Junior - Hombre",
+            group4: "Junior - Dama",
+            group5: "sub23 - Hombre",
+            group6: "sub23 - Dama"
+        };
+
+        var days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+
+        function User(name,lastname,username,password) {
+
+            this.token = '';
+            this.name = name;
+            this.lastname = lastname;
+            this.username = username;
+            this.password = password;
+        }
+
+        function WeeklyPlan(group, description, creator) {
+
+            this.id = 1; // get last id and increment by 1
+            this.group = group;
+            this.description = description;
+            this.creator = creator;
+            this.workouts = [];
+
+            this.addWorkout = function (day, daynum, month, description, percentage) {
+                if (this.workouts.length === 7) {
+                    console.log("It is not possible to add more workouts into this weekly plan.");
+                } else {
+                    this.workouts.push(new Workout(this, day, daynum, month, description, percentage));
+                }
+            }
+        }
+
+        function Workout(plan, day, daynum, month, description, percentage) {
+
+            this.planID = plan.id;
+            this.day = day;
+            this.daynum = daynum;
+            this.month = month;
+            this.year = new Date().getFullYear();
+            this.description = description;
+            this.percentage = percentage;
+        }
+
+        var myUser = new User("Ismael", "Fuentes", "user1", "password1");
+        var myPlan = new WeeklyPlan(groups.group1, "Semana 16/22 septiembre", myUser.name);
+
+        myPlan.addWorkout(days[0], 16, "Septiembre", "R5 150 (x4) x2, 8' de descanso entre bloques, 2' entre series.", "80%");
+        myPlan.addWorkout(days[1], 17, "Septiembre", "R2 (4-1 / 6-2 / 8-3 / 6-2 / 4) x1.", "80%");
+        myPlan.addWorkout(days[2], 18, "Septiembre", "R3 (200 esf 50 desc x4) x6 8' descanso entre bloques, 3' entre series", "80%");
+        myPlan.addWorkout(days[3], 19, "Septiembre", "R2 (1000m x3) x2 4' de descanso entre bloques, 2' entre series.", "80%");
+        myPlan.addWorkout(days[4], 20, "Septiembre", "R5 150 (x4) x2, 8' de descanso entre bloques, 2' entre series.", "80%");
+        myPlan.addWorkout(days[5], 21, "Septiembre", "R3 (200 esf 50 desc x4) x6 8' descanso entre bloques, 3' entre series", "80%");
+        myPlan.addWorkout(days[6], 22, "Septiembre", "Descanso", "-");
+
+        function viewPlan(array) {
+            var strTable = "<table id='WeeklyWorkout'><tr><td>Día</td><td>Mes</td><td>Entrenamiento</td><td>Carga</td></tr>";
+
+            array.forEach(elem => {
+                strTable += "<tr><td>" + elem.day + " " + elem.daynum + "</td><td>" + elem.month + "</td><td>" + elem.description + "</td><td>" + elem.percentage + "</td></tr>";
+            });
+            strTable += "</table>";
+
+            return strTable;
+        }
+
+    </script>
+
+    <style>
+        #WeeklyWorkout {
+            text-align: left;
+            border: 1px solid black;
+            margin-top: 10px;
+            padding: 5px;
+            width: 100%;
+        }
+    </style>
+
+</body>
+</html>
