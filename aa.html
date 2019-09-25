@@ -8,19 +8,28 @@
         <div id="main">
             <div id="square"></div>
             <div id="obstacles"></div>
+            <div id="scores">
+                <div id="container">
+                    <div id="hitpoints"></div>
+                </div>
+            </div>
         </div>
+
         <script>
             window.onload = function () {
                 KeyListener();
                 interval.initialize();
-                generateObstacles();
+                generateObstacles(12);
             };
 
-            var keys = [];
             var square = document.getElementById("square");
             var obstacles = document.getElementsByClassName("obstacle");
+            var hitpoints = document.getElementById("hitpoints");
+
+            var keys = [];
             var speedX = 0;
             var speedY = 0;
+            var life = 100;
 
             function KeyListener() {
 
@@ -34,13 +43,13 @@
 
             var interval = {
                 initialize: function () { setInterval(updateArea, 10); },
-                clear: function () { clearInterval(this); }
+                clear: function () { clearInterval(this.interval); }
             }
 
             function updateArea() {
                 MovementDetection();
                 detectCollision();
-                //Temblor();
+                gameOver();
             }
 
             function MovementDetection() {
@@ -63,21 +72,11 @@
                 } 
             }
 
-            function Temblor() {
-                var rdm = Math.random() * 0.5;
-                
-                square.style.marginLeft = rdm + "%";
-                square.style.marginLeft = -rdm + "%";
-                square.style.marginTop = rdm + "%";
-                square.style.marginTop = -rdm + "%";
-            }
-
-            function generateObstacles() {
-                //var rdm = Math.floor(Math.random() * 10);
+            function generateObstacles(num) {
 
                 var main = document.getElementById("obstacles");
 
-                for (let i = 0; i < 12; i++) {
+                for (let i = 0; i < num; i++) {
                     var obj = document.createElement("div");
                     obj.className = "obstacle";
                     main.appendChild(obj);
@@ -88,7 +87,8 @@
                 for (let i = 0; i < obstacles.length; i++) {
                     if (isOverlapped(square, obstacles[i])) {
                         obstacles[i].style.background = "red";
-                        return true;
+                        life -= 0.15;
+                        hitpoints.style.width = life + "%";
                     } else {
                         obstacles[i].style.background = "white";
                     }
@@ -101,11 +101,36 @@
                 return !(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom < rect2.top || rect1.top > rect2.bottom)
             }
 
+            function gameOver() {
+                if(life <= 0) {
+                    square.style.display = "none";
+                    interval.clear();
+                }
+            }
+
         </script>
 
         <style>
             #main {
                 text-align: center;
+            }
+            #scores {
+                margin-top: 50px;
+                width: 100%;
+                height: 50px;
+            }
+            #container{
+                display: inline-block;
+                margin: auto;
+                margin-top: 10px;
+                border: 1px solid black;
+                width: 250px;
+                height:25px;
+            }
+            #hitpoints{
+                width: 100%;
+                height:25px;
+                background: lightblue;
             }
             #square {
                 z-index: 2;
