@@ -8,10 +8,11 @@
         <div id="main">
             <div id="square"></div>
             <div id="obstacles"></div>
-            <div id="scores">
-                <div id="container">
-                    <div id="hitpoints"></div>
-                </div>
+        </div>
+
+        <div id="scores">
+            <div id="container">
+                <div id="hitpoints"></div>
             </div>
         </div>
 
@@ -61,15 +62,15 @@
                 if (keys[39]) {// rigth
                     speedX += 0.5;
                     square.style.marginLeft = speedX + "%";
-                } 
+                }
                 if (keys[38]) {// up
                     speedY -= 0.5;
                     square.style.marginTop = speedY + "%";
-                } 
+                }
                 if (keys[40]) {// down
                     speedY += 0.5;
                     square.style.marginTop = speedY + "%";
-                } 
+                }
             }
 
             function generateObstacles(num) {
@@ -88,7 +89,7 @@
                     if (isOverlapped(square, obstacles[i])) {
                         obstacles[i].style.background = "red";
                         life -= 0.15;
-                        hitpoints.style.width = life + "%";
+                        hitpoints.style.height = life + "%";
                     } else {
                         obstacles[i].style.background = "white";
                     }
@@ -98,11 +99,12 @@
             function isOverlapped(obj1, obj2) {
                 var rect1 = obj1.getBoundingClientRect();
                 var rect2 = obj2.getBoundingClientRect();
+
                 return !(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom < rect2.top || rect1.top > rect2.bottom)
             }
 
             function gameOver() {
-                if(life <= 0) {
+                if (life <= 0) {
                     square.style.display = "none";
                     interval.clear();
                 }
@@ -113,25 +115,33 @@
         <style>
             #main {
                 text-align: center;
+                float: left;
+                width: 300px;
+                height: 350px;
+                border: 1px solid black;
             }
+
             #scores {
-                margin-top: 50px;
-                width: 100%;
-                height: 50px;
+                width: auto;
+                height: 350px;
             }
-            #container{
+
+            #container {
                 display: inline-block;
                 margin: auto;
-                margin-top: 10px;
-                border: 1px solid black;
-                width: 250px;
-                height:25px;
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                border-right: 1px solid black;
+                width: 25px;
+                height: 100%;
             }
-            #hitpoints{
-                width: 100%;
-                height:25px;
+
+            #hitpoints {
+                width: 25px;
+                height: 100%;
                 background: lightblue;
             }
+
             #square {
                 z-index: 2;
                 position: absolute;
@@ -141,9 +151,11 @@
                 height: 25px;
                 display: inline-block;
             }
-            #obstacles{
+
+            #obstacles {
                 text-align: center;
             }
+
             .obstacle {
                 margin-top: 60px;
                 margin-left: 20px;
