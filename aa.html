@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>prueba</title>
+    </head>
+
+    <body>
+        <div id="main">
+            <div id="square"></div>
+            <div id="obstacles"></div>
+        </div>
+        <script>
+            window.onload = function () {
+                KeyListener();
+                interval.initialize();
+                generateObstacles();
+            };
+
+            var keys = [];
+            var square = document.getElementById("square");
+            var obstacles = document.getElementsByClassName("obstacle");
+            var speedX = 0;
+            var speedY = 0;
+
+            function KeyListener() {
+
+                window.addEventListener('keydown', function (e) {
+                    keys[e.keyCode] = true;
+                });
+                window.addEventListener('keyup', function (e) {
+                    keys[e.keyCode] = false;
+                });
+            }
+
+            var interval = {
+                initialize: function () { setInterval(updateArea, 10); },
+                clear: function () { clearInterval(this); }
+            }
+
+            function updateArea() {
+                MovementDetection();
+                detectCollision();
+                //Temblor();
+            }
+
+            function MovementDetection() {
+
+                if (keys[37]) {// left
+                    speedX -= 0.5;
+                    square.style.marginLeft = speedX + "%";
+                }
+                if (keys[39]) {// rigth
+                    speedX += 0.5;
+                    square.style.marginLeft = speedX + "%";
+                } 
+                if (keys[38]) {// up
+                    speedY -= 0.5;
+                    square.style.marginTop = speedY + "%";
+                } 
+                if (keys[40]) {// down
+                    speedY += 0.5;
+                    square.style.marginTop = speedY + "%";
+                } 
+            }
+
+            function Temblor() {
+                var rdm = Math.random() * 0.5;
+                
+                square.style.marginLeft = rdm + "%";
+                square.style.marginLeft = -rdm + "%";
+                square.style.marginTop = rdm + "%";
+                square.style.marginTop = -rdm + "%";
+            }
+
+            function generateObstacles() {
+                //var rdm = Math.floor(Math.random() * 10);
+
+                var main = document.getElementById("obstacles");
+
+                for (let i = 0; i < 12; i++) {
+                    var obj = document.createElement("div");
+                    obj.className = "obstacle";
+                    main.appendChild(obj);
+                }
+            }
+
+            function detectCollision() {
+                for (let i = 0; i < obstacles.length; i++) {
+                    if (isOverlapped(square, obstacles[i])) {
+                        obstacles[i].style.background = "red";
+                        return true;
+                    } else {
+                        obstacles[i].style.background = "white";
+                    }
+                }
+            }
+
+            function isOverlapped(obj1, obj2) {
+                var rect1 = obj1.getBoundingClientRect();
+                var rect2 = obj2.getBoundingClientRect();
+                return !(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom < rect2.top || rect1.top > rect2.bottom)
+            }
+
+        </script>
+
+        <style>
+            #main {
+                text-align: center;
+            }
+            #square {
+                z-index: 2;
+                position: absolute;
+                border: 1px solid black;
+                background: black;
+                width: 25px;
+                height: 25px;
+                display: inline-block;
+            }
+            #obstacles{
+                text-align: center;
+            }
+            .obstacle {
+                margin-top: 60px;
+                margin-left: 20px;
+                margin-right: 20px;
+                z-index: 1;
+                border: 1px solid black;
+                width: 25px;
+                height: 25px;
+                display: inline-block;
+            }
+        </style>
+    </body>
+</html>
