@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Expense App</title>
+         <link rel="stylesheet" type="text/css" href="styles.css">
+    </head>
+
+    <body>
+        <div id="app-nav">
+            <h4>Expenses</h4>
+            <hr />
+        </div>
+
+        <div id="app-body">
+            <input type="text" placeholder="expenses" id="input" />
+            <button id="btn-add" class="btn">Add</button>
+            <button id="btn-delete" class="btn">Remove</button>
+            <button id="btn-sum" class="btn">+</button>
+            <hr />
+
+            <div>
+                <table id="table-format">
+                    <thead>
+                        <tr>
+                            <th>quantity</th>
+                            <th>total</th>
+                            <th>unitary price</th>
+                            <th>remove</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table">
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="Expenses">
+                <hr />
+                <p id="total"></p>
+            </div>
+        </div>
+
+        <script src="utils/utils.js"></script>
+        <script src="controller/controller.js"></script>
+    </body>
+</html>

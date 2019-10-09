@@ -1,0 +1,28 @@
+.row {
+
+}
+
+.value{
+
+}
+
+.chk{
+    cursor: pointer;
+}
+
+.btn{
+    cursor:pointer;
+    border-radius: 20px;
+    outline: none;
+}
+
+#input{
+    border: none;
+    outline: none;
+    padding: 5px;
+}
+
+#table-format{
+    text-align: center;
+    width: 100%;
+}
