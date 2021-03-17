@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Image Lazy loading</title>
+    </head>
+    <body>
+        <h1>Some random title</h1>
+        <p>Some random text</p>
+        </br>
+        <p>blah</p>
+        </br>
+        <p>blah</p>
+        </br>
+        <p>blah</p>
+        </br>
+        <h3>Some random image</h3>
+        <img src="compressed.png" 
+             data-src="sample.png"
+             width="450" height="300" 
+             class="lazy">
+        <script src="script.js"></script>
+    </body>
+
+    <style>
+        .lazy{
+            filter: blur(0.50rem);
+        }
+    </style>
+</html>
