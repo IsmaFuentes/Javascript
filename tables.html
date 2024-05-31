@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tables</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="page-table" style="height: 48%; padding: 10px"></div>
+    <div id="virt-table" style="height: 48%; padding: 10px"></div>
+  </body>
+  <script>
+    // HTMLElement.prototype.applyStyles = function (props) {
+    //   Object.assign(this.style, { ...props });
+    // };
+
+    const getData = async () => {
+      return new Promise((resolve) => {
+        const source = [];
+        const length = 100000;
+        for (let i = 0; i < length; i++) {
+          source.push({
+            id: i,
+            description: 'Descripción test 1234',
+            dateTime: new Date().toISOString(),
+          });
+        }
+        resolve(source);
+      });
+    };
+
+    window.onload = () => {
+      const container1 = document.querySelector('#page-table');
+      const container2 = document.querySelector('#virt-table');
+      getData().then((data) => {
+        renderPaginatedTable(container1, data, 100);
+        renderVirtualizedTable(container2, data, 100);
+      });
+    };
+
+    const renderPaginatedTable = (parent, dataSource, maxCount) => {
+      const propKeys = Object.keys(dataSource[0] ?? {});
+
+      // table
+      const table = document.createElement('table');
+      table.style.tableLayout = 'fixed';
+      table.style.height = '100%';
+      table.style.width = '100%';
+      table.style.borderSpacing = '0px';
+
+      // header + header columns
+      const header = table.createTHead();
+      header.style.top = '0px';
+      header.style.position = 'sticky';
+      header.style.background = 'black';
+      header.style.color = 'white';
+      header.style.textAlign = 'center';
+      header.style.height = '30px';
+
+      const headerRow = header.insertRow();
+      propKeys.forEach((key) => {
+        const cell = headerRow.insertCell();
+        cell.textContent = key;
+      });
+
+      table.appendChild(header);
+
+      // table body
+      const tBody = table.createTBody();
+      renderRows(tBody, dataSource, 0, maxCount);
+
+      const removeNodes = () => {
+        while (tBody.hasChildNodes()) {
+          tBody.removeChild(tBody.lastChild);
+        }
+      };
+
+      const tableWrapper = document.createElement('div');
+      tableWrapper.style.display = 'flex';
+      tableWrapper.style.flexDirection = 'column';
+      tableWrapper.style.width = '100%';
+      tableWrapper.style.overflowY = 'scroll';
+      tableWrapper.style.height = '100%';
+      tableWrapper.appendChild(table);
+
+      const pages = dataSource.length / maxCount - 1;
+
+      const buttonWrapper = document.createElement('div');
+      buttonWrapper.style.background = 'white';
+      buttonWrapper.style.position = 'sticky';
+      buttonWrapper.style.bottom = '0px';
+      tableWrapper.style.borderSpacing = '0px';
+
+      const prevBtn = document.createElement('button');
+      prevBtn.type = 'button';
+      prevBtn.textContent = '<';
+      prevBtn.addEventListener('click', () => {
+        const elem = document.querySelector('#page-display');
+        const indx = parseInt(elem.textContent);
+        if (indx > 1) {
+          const startIndex = maxCount * (indx - 1) - maxCount;
+          removeNodes();
+          renderRows(tBody, dataSource, startIndex, maxCount);
+          elem.textContent = indx - 1;
+        }
+      });
+      buttonWrapper.appendChild(prevBtn);
+
+      const pageDisplay = document.createElement('label');
+      pageDisplay.textContent = '1';
+      pageDisplay.id = 'page-display';
+      pageDisplay.style.padding = '0px 5px 0px 5px';
+      buttonWrapper.appendChild(pageDisplay);
+
+      const nextBtn = document.createElement('button');
+      nextBtn.type = 'button';
+      nextBtn.textContent = '>';
+      nextBtn.addEventListener('click', () => {
+        const elem = document.querySelector('#page-display');
+        const indx = parseInt(elem.textContent) + 1;
+        const startIndex = maxCount * (indx - 1);
+        if (startIndex < dataSource.length) {
+          removeNodes();
+          console.log(startIndex);
+          renderRows(tBody, dataSource, startIndex, maxCount);
+          elem.textContent = indx;
+        }
+      });
+      buttonWrapper.appendChild(nextBtn);
+      tableWrapper.appendChild(buttonWrapper);
+
+      parent.appendChild(tableWrapper);
+    };
+
+    // https://stackoverflow.com/questions/21715927/table-row-not-expanding-to-full-width
+    const renderVirtualizedTable = (parent, dataSource, maxCount) => {
+      const propKeys = Object.keys(dataSource[0] ?? {});
+
+      // table
+      const table = document.createElement('table');
+      table.style.tableLayout = 'fixed';
+      table.style.height = '100%';
+      table.style.width = '100%';
+      table.style.borderSpacing = '0px';
+
+      // header + header columns
+      const header = table.createTHead();
+      header.style.top = '0px';
+      header.style.position = 'sticky';
+      header.style.background = 'black';
+      header.style.color = 'white';
+      header.style.textAlign = 'center';
+      header.style.height = '30px';
+
+      const headerRow = header.insertRow();
+      propKeys.forEach((key) => {
+        const cell = headerRow.insertCell();
+        cell.textContent = key;
+      });
+
+      table.appendChild(header);
+
+      // table body
+      const tBody = table.createTBody();
+      renderRows(tBody, dataSource, 0, maxCount);
+
+      const tableWrapper = document.createElement('div');
+      tableWrapper.style.width = '100%';
+      tableWrapper.style.overflowY = 'scroll';
+      tableWrapper.style.height = '100%';
+      tableWrapper.appendChild(table);
+
+      const mRenderOffset = 100;
+      const mRenderThresh = mRenderOffset + 50;
+      tableWrapper.addEventListener('scroll', (e) => {
+        const currentScroll =
+          tableWrapper.offsetHeight + tableWrapper.scrollTop;
+        console.log(table.rows.length);
+        if (currentScroll >= tableWrapper.scrollHeight - mRenderOffset) {
+          if (table.rows.length < dataSource.length) {
+            // 1. Render next rows
+            // 2. Unrender top rows
+            //for(let i = 0; i < 10; i++)
+            renderRow(table, dataSource[table.rows.length + 1]);
+          }
+        } else {
+          const diff = table.scrollHeight - currentScroll;
+          if (table.rows.length > maxCount && diff > mRenderThresh) {
+            table.deleteRow(table.rows.length - 1);
+          }
+        }
+      });
+
+      parent.appendChild(tableWrapper);
+    };
+
+    // tablebody = table || tBody
+    const renderRows = (
+      table,
+      dataSource = [],
+      startIndex = 0,
+      maxRows = 100
+    ) => {
+      const data = [...dataSource].slice(startIndex, startIndex + maxRows + 1);
+      for (let i = 0; i < data.length - 1; i++) {
+        const propKeys = Object.keys(data[i] ?? {});
+        const tableRow = table.insertRow();
+        propKeys.forEach((key) => {
+          const cell = tableRow.insertCell();
+          cell.textContent = data[i][key];
+        });
+      }
+    };
+
+    // tablebody = table || tBody
+    const renderRow = (tableBody, data) => {
+      const keys = Object.keys(data);
+      const tableRow = tableBody.insertRow();
+      keys.forEach((key) => {
+        const cell = tableRow.insertCell();
+        cell.textContent = data[key];
+      });
+    };
+
+    // const isVisible = (elem) => {
+    //   const rect = elem.getBoundingClientRect();
+    //   const vh = Math.max(
+    //     document.documentElement.clientHeight,
+    //     window.innerHeight
+    //   );
+    //   return !(rect.bottom < 0 || rect.top - vh >= 0);
+    // };
+  </script>
+</html>
