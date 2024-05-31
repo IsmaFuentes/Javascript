@@ -202,8 +202,8 @@
       startIndex = 0,
       maxRows = 100
     ) => {
-      const data = [...dataSource].slice(startIndex, startIndex + maxRows + 1);
-      for (let i = 0; i < data.length - 1; i++) {
+      const data = [...dataSource].slice(startIndex, startIndex + maxRows);
+      for (let i = 0; i < data.length; i++) {
         const propKeys = Object.keys(data[i] ?? {});
         const tableRow = table.insertRow();
         propKeys.forEach((key) => {
