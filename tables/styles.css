@@ -1,0 +1,10 @@
+html {
+  height: 100vh;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
+    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+}
