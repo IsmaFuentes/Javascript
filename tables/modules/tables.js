@@ -11,8 +11,9 @@ const ClientSidePaginatedTable = (dataSource = [], maxCount = 100) => {
   const table = document.createElement('table');
   table.style.tableLayout = 'fixed';
   table.style.height = '100%';
-  table.style.width = '100%';
+  table.style.minWidth = '100%';
   table.style.borderSpacing = '0px';
+  table.style.fontSize = '13px';
 
   const tbody = table.createTBody();
 
@@ -27,6 +28,8 @@ const ClientSidePaginatedTable = (dataSource = [], maxCount = 100) => {
   display.id = 'page-display';
   display.textContent = getPagerCaption(1);
   display.style.padding = '0px 10px 0px 10px';
+  display.style.background = 'white';
+  display.style.textAlign = 'center';
 
   const sortState = propKeys.reduce((state, key) => {
     state[key] = 'asc';
@@ -118,7 +121,13 @@ const ClientSidePaginatedTable = (dataSource = [], maxCount = 100) => {
   tfoot.style.bottom = '0px';
   tfoot.style.position = 'sticky';
   tfoot.style.background = 'white';
-  tfoot.append(...[btnBack, display, btnNext]);
+
+  const footRow = tfoot.insertRow();
+  footRow.style.width = '100%';
+
+  const footerRowCell = footRow.insertCell();
+  footerRowCell.colSpan = 5;
+  footerRowCell.append(...[btnBack, display, btnNext]);
 
   return { tableWrapper, sort, filter, clear };
 };
