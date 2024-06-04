@@ -1,15 +1,14 @@
-import { createPaginatedTable } from './modules/tables.js';
+import { ClientSidePaginatedTable } from './modules/tables.js';
 
 window.onload = () => {
   const container = document.querySelector('#tables');
-  getData().then((data) => {
-    const { tableWrapper, filter, clear } = createPaginatedTable(data, 100);
+  getDummyData().then((data) => {
+    const { tableWrapper, filter, clear } = ClientSidePaginatedTable(data, 25);
     container.append(tableWrapper);
 
     document
       .querySelector('#filter-input')
       .addEventListener('keyup', function (e) {
-        console.log(this.value.length);
         if (this.value.length >= 3) {
           filter(this.value, true);
         } else if (this.value.length == 0) {
@@ -19,6 +18,16 @@ window.onload = () => {
 
     document.querySelector('#clear-submit').addEventListener('click', clear);
   });
+};
+
+/**
+ * https://random-data-api.com/documentation
+ */
+const getDummyData = async () => {
+  const baseUri = 'https://random-data-api.com/api/v2/beers?size=100';
+  return await fetch(baseUri, { headers: { contentType: 'application/json' } })
+    .then((response) => response.json())
+    .then((data) => data);
 };
 
 const getData = async () => {

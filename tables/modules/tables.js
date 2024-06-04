@@ -1,10 +1,10 @@
 /**
- * Crea una tabla con funcionalidades de paginación, filtrado y ordenación
+ * Crea una tabla con funcionalidades de paginación, filtrado y ordenación en modo cliente
  * @param {Array} dataSource
  * @param {Number} maxCount
  * @returns {{ tableWrapper: HTMLElement, sort: () => void, filter: (filterString: String, rerender: Boolean) => void, clear: () => void }}
  */
-const createPaginatedTable = (dataSource = [], maxCount = 100) => {
+const ClientSidePaginatedTable = (dataSource = [], maxCount = 100) => {
   let data = [...dataSource];
   const propKeys = Object.keys(data[0] ?? {});
 
@@ -34,6 +34,7 @@ const createPaginatedTable = (dataSource = [], maxCount = 100) => {
   }, {});
 
   const sort = (key) => {
+    // ojo: realiza el mismo tipo de filtro para todas las propiedades
     data.sort((a, b) => {
       if (sortState[key] == 'asc') {
         return a[key] > b[key] ? -1 : 0;
@@ -41,7 +42,7 @@ const createPaginatedTable = (dataSource = [], maxCount = 100) => {
         return a[key] < b[key] ? -1 : 0;
       }
     });
-    renderRows(tbody, data, 0, 100);
+    renderRows(tbody, data, 0, maxCount);
     sortState[key] = sortState[key] == 'asc' ? 'des' : 'asc';
     display.textContent = getPagerCaption(1);
   };
@@ -52,14 +53,13 @@ const createPaginatedTable = (dataSource = [], maxCount = 100) => {
         propertyValue.toString().includes(filterString)
       )
     );
-
-    renderRows(tbody, data, 0, 100);
+    renderRows(tbody, data, 0, maxCount);
     display.textContent = getPagerCaption(1);
   };
 
   const clear = () => {
     data = [...dataSource];
-    renderRows(tbody, data, 0, 100);
+    renderRows(tbody, data, 0, maxCount);
     display.textContent = getPagerCaption(1);
   };
 
@@ -154,4 +154,4 @@ const renderRows = (table, dataSource = [], start = 0, max = 100) => {
   spacingRow.style.lineHeight = '0px';
 };
 
-export { createPaginatedTable };
+export { ClientSidePaginatedTable };
