@@ -1,10 +1,14 @@
 /**
  * Crea una tabla con funcionalidades de paginación, filtrado y ordenación en modo cliente
- * @param {Array} dataSource
- * @param {Number} maxCount
+ * @param {Array} dataSource Array de objetos a partir del cual generar la tabla
+ * @param {Array} maxRowValues Valores máximos para el paginador
  * @returns {{ tableWrapper: HTMLElement, sort: () => void, filter: (filterString: String) => void, reset: () => void }}
  */
-const CreatePaginatedTable = (dataSource = [], maxCount = 100) => {
+const CreatePaginatedTable = (
+  dataSource = [],
+  maxRowValues = [25, 50, 75, 100]
+) => {
+  let maxCount = Math.max(...maxRowValues);
   let data = [...dataSource];
 
   const table = document.createElement('table');
@@ -115,17 +119,22 @@ const CreatePaginatedTable = (dataSource = [], maxCount = 100) => {
     }
   });
 
-  // idea: seleccionar maxRows de forma dinamica..
-  // const maxRowCountSelector = document.createElement('select');
-  // maxRowCountSelector.title = 'row-selector';
-  // maxRowCountSelector.style.width = '75px';
-  // maxRowCountSelector.style.marginLeft = '5px';
-  // [25, 50, 75, maxCount].forEach((max) => {
-  //   const option = document.createElement('option');
-  //   option.value = max;
-  //   option.text = max;
-  //   maxRowCountSelector.options.add(option);
-  // });
+  const maxRowCountSelector = document.createElement('select');
+  maxRowCountSelector.title = 'row-selector';
+  maxRowCountSelector.style.width = '75px';
+  maxRowCountSelector.style.marginLeft = '5px';
+  maxRowValues.forEach((max) => {
+    const option = document.createElement('option');
+    option.value = max;
+    option.text = max;
+    maxRowCountSelector.options.add(option);
+  });
+
+  maxRowCountSelector.selectedIndex = maxRowValues.length - 1;
+  maxRowCountSelector.addEventListener('change', () => {
+    maxCount = maxRowValues[maxRowCountSelector.selectedIndex];
+    reset();
+  });
 
   const tfoot = table.createTFoot();
   tfoot.style.bottom = '0px';
@@ -137,7 +146,7 @@ const CreatePaginatedTable = (dataSource = [], maxCount = 100) => {
 
   const footerRowCell = footRow.insertCell();
   footerRowCell.colSpan = propKeys.length;
-  footerRowCell.append(...[btnBack, display, btnNext]);
+  footerRowCell.append(...[btnBack, display, btnNext, maxRowCountSelector]);
 
   return { tableWrapper, sort, filter, reset };
 };

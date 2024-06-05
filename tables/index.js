@@ -3,7 +3,10 @@ import { CreatePaginatedTable } from './modules/tables.js';
 window.onload = () => {
   const container = document.querySelector('#tables');
   createDataSource().then((data) => {
-    const { tableWrapper, filter, reset } = CreatePaginatedTable(data, 100);
+    const { tableWrapper, filter, reset } = CreatePaginatedTable(
+      data,
+      [50, 100, 150, 200]
+    );
     container.append(tableWrapper);
 
     document
