@@ -2,11 +2,10 @@
  * Crea una tabla con funcionalidades de paginación, filtrado y ordenación en modo cliente
  * @param {Array} dataSource
  * @param {Number} maxCount
- * @returns {{ tableWrapper: HTMLElement, sort: () => void, filter: (filterString: String, rerender: Boolean) => void, clear: () => void }}
+ * @returns {{ tableWrapper: HTMLElement, sort: () => void, filter: (filterString: String) => void, reset: () => void }}
  */
-const ClientSidePaginatedTable = (dataSource = [], maxCount = 100) => {
+const CreatePaginatedTable = (dataSource = [], maxCount = 100) => {
   let data = [...dataSource];
-  const propKeys = Object.keys(data[0] ?? {});
 
   const table = document.createElement('table');
   table.style.tableLayout = 'fixed';
@@ -31,13 +30,14 @@ const ClientSidePaginatedTable = (dataSource = [], maxCount = 100) => {
   display.style.background = 'white';
   display.style.textAlign = 'center';
 
+  const propKeys = Object.keys(data[0] ?? {});
+
   const sortState = propKeys.reduce((state, key) => {
     state[key] = 'asc';
     return state;
   }, {});
 
   const sort = (key) => {
-    // ojo: realiza el mismo tipo de filtro para todas las propiedades
     data.sort((a, b) => {
       if (sortState[key] == 'asc') {
         return a[key] > b[key] ? -1 : 0;
@@ -60,7 +60,7 @@ const ClientSidePaginatedTable = (dataSource = [], maxCount = 100) => {
     display.textContent = getPagerCaption(1);
   };
 
-  const clear = () => {
+  const reset = () => {
     data = [...dataSource];
     renderRows(tbody, data, 0, maxCount);
     display.textContent = getPagerCaption(1);
@@ -97,7 +97,6 @@ const ClientSidePaginatedTable = (dataSource = [], maxCount = 100) => {
     const index = parseInt(display.textContent) + 1;
     const start = maxCount * (index - 1);
     if (start < data.length) {
-      removeRows(tbody);
       renderRows(tbody, data, start, maxCount);
       display.textContent = getPagerCaption(index);
     }
@@ -111,11 +110,22 @@ const ClientSidePaginatedTable = (dataSource = [], maxCount = 100) => {
     const index = parseInt(display.textContent);
     if (index > 1) {
       const start = maxCount * (index - 1) - maxCount;
-      removeRows(tbody);
       renderRows(tbody, data, start, maxCount);
       display.textContent = getPagerCaption(index - 1);
     }
   });
+
+  // idea: seleccionar maxRows de forma dinamica..
+  // const maxRowCountSelector = document.createElement('select');
+  // maxRowCountSelector.title = 'row-selector';
+  // maxRowCountSelector.style.width = '75px';
+  // maxRowCountSelector.style.marginLeft = '5px';
+  // [25, 50, 75, maxCount].forEach((max) => {
+  //   const option = document.createElement('option');
+  //   option.value = max;
+  //   option.text = max;
+  //   maxRowCountSelector.options.add(option);
+  // });
 
   const tfoot = table.createTFoot();
   tfoot.style.bottom = '0px';
@@ -126,31 +136,26 @@ const ClientSidePaginatedTable = (dataSource = [], maxCount = 100) => {
   footRow.style.width = '100%';
 
   const footerRowCell = footRow.insertCell();
-  footerRowCell.colSpan = 5;
+  footerRowCell.colSpan = propKeys.length;
   footerRowCell.append(...[btnBack, display, btnNext]);
 
-  return { tableWrapper, sort, filter, clear };
-};
-
-const removeRows = (tbody) => {
-  while (tbody.hasChildNodes()) {
-    tbody.removeChild(tbody.lastChild);
-  }
+  return { tableWrapper, sort, filter, reset };
 };
 
 /**
  * Crea los elementos de la tabla
- * @param {HTMLTableElement} table
+ * @param {HTMLTableSectionElement} tbody
  * @param {Array} dataSource
  * @param {Number} start
  * @param {Number} max
  */
-const renderRows = (table, dataSource = [], start = 0, max = 100) => {
-  removeRows(table);
+const renderRows = async (tbody, dataSource = [], start = 0, max = 100) => {
+  tbody.innerHTML = '';
+  // const p1 = performance.now();
   const data = [...dataSource].slice(start, start + max);
   for (let i = 0; i < data.length; i++) {
     const propKeys = Object.keys(data[i] ?? {});
-    const tableRow = table.insertRow();
+    const tableRow = tbody.insertRow();
     propKeys.forEach((key) => {
       const cell = tableRow.insertCell();
       cell.textContent = data[i][key];
@@ -158,9 +163,11 @@ const renderRows = (table, dataSource = [], start = 0, max = 100) => {
       cell.style.border = '1px solid lightgray';
     });
   }
-
-  const spacingRow = table.insertRow();
+  const spacingRow = tbody.insertRow();
   spacingRow.style.lineHeight = '0px';
+  // console.log('render time: ', performance.now() - p1 + 'ms');
 };
 
-export { ClientSidePaginatedTable };
+// https://hrily.github.io/blog/2017/05/20/rendering-large-html-tables.html
+
+export { CreatePaginatedTable };
